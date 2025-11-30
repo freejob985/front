@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار متغيرات البيئة للـ Proxy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .config-display {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 اختبار متغيرات البيئة للـ Proxy</h1>
+        <p>هذا الملف يختبر متغيرات البيئة الجديدة للتحكم في Vite proxy</p>
+        
+        <div class="test-section">
+            <h3>1. اختبار متغيرات البيئة</h3>
+            <button onclick="testEnvVars()">اختبار متغيرات البيئة</button>
+            <div id="env-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. اختبار إعدادات Proxy</h3>
+            <button onclick="testProxyConfig()">اختبار إعدادات Proxy</button>
+            <div id="proxy-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. اختبار الاتصال عبر Proxy</h3>
+            <button onclick="testProxyConnection()">اختبار الاتصال</button>
+            <div id="connection-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. عرض الإعدادات الحالية</h3>
+            <button onclick="showCurrentConfig()">عرض الإعدادات</button>
+            <div id="config-results"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // اختبار متغيرات البيئة
+        function testEnvVars() {
+            const resultsDiv = document.getElementById('env-results');
+            
+            const envVars = {
+                'VITE_API_URL': import.meta.env.VITE_API_URL,
+                'VITE_API_BASE_URL': import.meta.env.VITE_API_BASE_URL,
+                'VITE_API_TARGET': import.meta.env.VITE_API_TARGET,
+                'VITE_ADMIN_TARGET': import.meta.env.VITE_ADMIN_TARGET,
+                'VITE_ADMIN_URL': import.meta.env.VITE_ADMIN_URL,
+                'VITE_APP_NAME': import.meta.env.VITE_APP_NAME,
+                'VITE_DEBUG': import.meta.env.VITE_DEBUG
+            };
+            
+            let html = '<h4>نتائج متغيرات البيئة:</h4>';
+            
+            Object.entries(envVars).forEach(([key, value]) => {
+                const status = value ? 'success' : 'error';
+                const statusText = value ? '✅ موجود' : '❌ غير موجود';
+                html += `<div class="result ${status}"><strong>${key}:</strong> <code>${value || 'غير محدد'}</code> ${statusText}</div>`;
+            });
+            
+            // التحقق من إعدادات Proxy
+            const apiTarget = import.meta.env.VITE_API_TARGET;
+            const adminTarget = import.meta.env.VITE_ADMIN_TARGET;
+            const apiUrl = import.meta.env.VITE_API_URL;
+            
+            const isProxyConfigured = apiTarget && adminTarget && apiUrl && apiUrl.includes('localhost:5174');
+            
+            html += `<div class="result ${isProxyConfigured ? 'success' : 'warning'}">
+                <h4>إعدادات Proxy:</h4>
+                <p><strong>API Target:</strong> <code>${apiTarget || 'غير محدد'}</code></p>
+                <p><strong>Admin Target:</strong> <code>${adminTarget || 'غير محدد'}</code></p>
+                <p><strong>API URL (Local):</strong> <code>${apiUrl || 'غير محدد'}</code></p>
+                <p><strong>Proxy مُعد:</strong> ${isProxyConfigured ? '✅ نعم' : '❌ لا'}</p>
+            </div>`;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // اختبار إعدادات Proxy
+        function testProxyConfig() {
+            const resultsDiv = document.getElementById('proxy-results');
+            
+            const apiTarget = import.meta.env.VITE_API_TARGET;
+            const adminTarget = import.meta.env.VITE_ADMIN_TARGET;
+            const apiUrl = import.meta.env.VITE_API_URL;
+            
+            let html = '<h4>إعدادات Proxy:</h4>';
+            
+            // اختبار API Target
+            const apiTargetValid = apiTarget && (apiTarget.startsWith('http://') || apiTarget.startsWith('https://'));
+            html += `<div class="result ${apiTargetValid ? 'success' : 'error'}">
+                <strong>API Target:</strong> <code>${apiTarget || 'غير محدد'}</code> 
+                ${apiTargetValid ? '✅ صحيح' : '❌ غير صحيح'}
+            </div>`;
+            
+            // اختبار Admin Target
+            const adminTargetValid = adminTarget && (adminTarget.startsWith('http://') || adminTarget.startsWith('https://'));
+            html += `<div class="result ${adminTargetValid ? 'success' : 'error'}">
+                <strong>Admin Target:</strong> <code>${adminTarget || 'غير محدد'}</code> 
+                ${adminTargetValid ? '✅ صحيح' : '❌ غير صحيح'}
+            </div>`;
+            
+            // اختبار API URL المحلي
+            const localApiValid = apiUrl && apiUrl.includes('localhost:5174');
+            html += `<div class="result ${localApiValid ? 'success' : 'error'}">
+                <strong>API URL (Local):</strong> <code>${apiUrl || 'غير محدد'}</code> 
+                ${localApiValid ? '✅ يستخدم localhost' : '❌ لا يستخدم localhost'}
+            </div>`;
+            
+            // ملخص الإعدادات
+            const allValid = apiTargetValid && adminTargetValid && localApiValid;
+            html += `<div class="result ${allValid ? 'success' : 'warning'}">
+                <h4>ملخص الإعدادات:</h4>
+                <p><strong>الحالة العامة:</strong> ${allValid ? '✅ جميع الإعدادات صحيحة' : '⚠️ بعض الإعدادات تحتاج تصحيح'}</p>
+                <p><strong>Proxy جاهز:</strong> ${allValid ? '✅ نعم' : '❌ لا'}</p>
+            </div>`;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // اختبار الاتصال عبر Proxy
+        async function testProxyConnection() {
+            const resultsDiv = document.getElementById('connection-results');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5174/api/v1';
+            const testEndpoint = '/api/v1/settings/general';
+            
+            resultsDiv.innerHTML = '<div class="result info">جاري اختبار الاتصال عبر Proxy...</div>';
+            
+            try {
+                const response = await fetch(testEndpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ نجح الاتصال عبر Proxy!</h4>
+                            <p><strong>الرابط المحلي:</strong> <code>${testEndpoint}</code></p>
+                            <p><strong>الرابط الكامل:</strong> <code>${apiUrl}${testEndpoint}</code></p>
+                            <p><strong>الحالة:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>البيانات:</strong> <code>${JSON.stringify(data).substring(0, 100)}...</code></p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="result error">
+                            <h4>❌ فشل الاتصال عبر Proxy</h4>
+                            <p><strong>الرابط:</strong> <code>${testEndpoint}</code></p>
+                            <p><strong>الحالة:</strong> ${response.status} ${response.statusText}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="result error">
+                        <h4>❌ خطأ في الاتصال عبر Proxy</h4>
+                        <p><strong>الرابط:</strong> <code>${testEndpoint}</code></p>
+                        <p><strong>الخطأ:</strong> ${error.message}</p>
+                        <p><strong>تأكد من:</strong> تشغيل خادم التطوير (npm run dev)</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // عرض الإعدادات الحالية
+        function showCurrentConfig() {
+            const resultsDiv = document.getElementById('config-results');
+            
+            const config = {
+                'Frontend URL': import.meta.env.VITE_APP_URL,
+                'API URL (Local)': import.meta.env.VITE_API_URL,
+                'API Base URL': import.meta.env.VITE_API_BASE_URL,
+                'API Target (Remote)': import.meta.env.VITE_API_TARGET,
+                'Admin URL (Local)': import.meta.env.VITE_ADMIN_URL,
+                'Admin Target (Remote)': import.meta.env.VITE_ADMIN_TARGET,
+                'App Name': import.meta.env.VITE_APP_NAME,
+                'Debug Mode': import.meta.env.VITE_DEBUG,
+                'Environment': import.meta.env.VITE_APP_ENV
+            };
+            
+            let html = '<h4>الإعدادات الحالية:</h4>';
+            html += '<div class="config-display">';
+            
+            Object.entries(config).forEach(([key, value]) => {
+                html += `${key}: ${value || 'غير محدد'}\n`;
+            });
+            
+            html += '</div>';
+            
+            // شرح كيفية عمل Proxy
+            html += `
+                <div class="result info">
+                    <h4>كيف يعمل Proxy:</h4>
+                    <p><strong>1. الطلب من المتصفح:</strong> <code>${import.meta.env.VITE_API_URL || 'http://localhost:5174/api/v1'}/settings/general</code></p>
+                    <p><strong>2. Vite Proxy يعيد التوجيه إلى:</strong> <code>${import.meta.env.VITE_API_TARGET || 'https://adminxd.eliteonegrocery.com'}/api/v1/settings/general</code></p>
+                    <p><strong>3. النتيجة:</strong> حل مشكلة CORS + تحكم كامل في الوجهة</p>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // اختبار تلقائي عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            testEnvVars();
+        });
+        
+        // جعل الدوال متاحة عالمياً
+        window.testEnvVars = testEnvVars;
+        window.testProxyConfig = testProxyConfig;
+        window.testProxyConnection = testProxyConnection;
+        window.showCurrentConfig = showCurrentConfig;
+    </script>
+</body>
+</html>

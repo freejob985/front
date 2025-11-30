@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Login</title>
+</head>
+<body>
+    <h1>Debug Login Test</h1>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" value="test@example.com">
+        <input type="password" id="password" placeholder="Password" value="password">
+        <button type="submit">Login</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+        
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Test login
+                console.log('Testing login...');
+                const loginResponse = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const loginData = await loginResponse.json();
+                console.log('Login response:', loginData);
+                resultDiv.innerHTML += `<p>Login Response: ${JSON.stringify(loginData)}</p>`;
+                
+                if (loginData.success) {
+                    // Test me endpoint
+                    console.log('Testing me endpoint...');
+                    const meResponse = await fetch(`${API_BASE}/auth/me`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        credentials: 'include'
+                    });
+                    
+                    const meData = await meResponse.json();
+                    console.log('Me response:', meData);
+                    resultDiv.innerHTML += `<p>Me Response: ${JSON.stringify(meData)}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            testLogin();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Environment Variables</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .result { margin: 20px 0; padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>اختبار متغيرات البيئة</h1>
+    
+    <div id="result"></div>
+    
+    <script type="module">
+        const resultDiv = document.getElementById('result');
+        
+        try {
+            // اختبار متغيرات البيئة
+            const envVars = {
+                'VITE_API_URL': import.meta.env.VITE_API_URL,
+                'VITE_API_BASE_URL': import.meta.env.VITE_API_BASE_URL,
+                'VITE_API_PREFIX': import.meta.env.VITE_API_PREFIX,
+                'VITE_ADMIN_URL': import.meta.env.VITE_ADMIN_URL,
+                'VITE_APP_URL': import.meta.env.VITE_APP_URL,
+                'VITE_APP_NAME': import.meta.env.VITE_APP_NAME
+            };
+            
+            console.log('Environment Variables:', envVars);
+            
+            let html = '<h2>متغيرات البيئة:</h2>';
+            
+            Object.entries(envVars).forEach(([key, value]) => {
+                const status = value ? 'success' : 'error';
+                const statusText = value ? '✅' : '❌';
+                html += `
+                    <div class="result ${status}">
+                        <strong>${key}:</strong> ${value || 'غير محدد'}
+                        <span style="float: right;">${statusText}</span>
+                    </div>
+                `;
+            });
+            
+            // اختبار API URL
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+            html += `
+                <div class="result ${apiUrl.includes('engeb.com') ? 'success' : 'error'}">
+                    <h3>الرابط المستخدم للـ API:</h3>
+                    <p><strong>${apiUrl}</strong></p>
+                    <p>${apiUrl.includes('engeb.com') ? '✅ يستخدم رابط engeb.com' : '❌ لا يستخدم رابط engeb.com'}</p>
+                </div>
+            `;
+            
+            resultDiv.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.innerHTML = `
+                <div class="result error">
+                    <h3>❌ خطأ في اختبار متغيرات البيئة</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

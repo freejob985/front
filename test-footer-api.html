@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار API شعار الفوتر</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border: 1px solid #ddd;
+        }
+        .success { 
+            background-color: #d4edda; 
+            border-color: #c3e6cb; 
+            color: #155724; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            border-color: #f5c6cb; 
+            color: #721c24; 
+        }
+        .info { 
+            background-color: #d1ecf1; 
+            border-color: #bee5eb; 
+            color: #0c5460; 
+        }
+        .logo-preview { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background-color: #1f2937; 
+            color: white; 
+            border-radius: 8px;
+        }
+        .logo-preview img { 
+            height: 48px; 
+            width: auto; 
+            margin-bottom: 16px; 
+            filter: brightness(0) invert(1);
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px; 
+            background-color: #007bff; 
+            color: white;
+        }
+        button:hover { background-color: #0056b3; }
+        pre { 
+            background-color: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار API شعار الفوتر</h1>
+        <p>هذه الصفحة تختبر استجابة API لشعار الفوتر مباشرة.</p>
+        
+        <div>
+            <button onclick="testGeneralSettings()">اختبار الإعدادات العامة</button>
+            <button onclick="testDesignSettings()">اختبار إعدادات التصميم</button>
+            <button onclick="testBoth()">اختبار كليهما</button>
+            <button onclick="clearResults()">مسح النتائج</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="logo-preview">
+            <h3>معاينة الشعار:</h3>
+            <div id="logo-container">
+                <p>اضغط على "اختبار كليهما" لرؤية الشعار</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function getImageUrl(imagePath) {
+            if (!imagePath) return '/images/logo.png';
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            if (imagePath.startsWith('storage/')) {
+                return `http://localhost:8000/storage/${imagePath}`;
+            }
+            if (imagePath.startsWith('/')) {
+                return `http://localhost:8000${imagePath}`;
+            }
+            return `http://localhost:8000/${imagePath}`;
+        }
+
+        async function testGeneralSettings() {
+            addResult('🔍 اختبار الإعدادات العامة...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/settings/general`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ نجح تحميل الإعدادات العامة (${response.status})`, 'success');
+                    addResult(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                    
+                    if (data.data && data.data.site_logo_url) {
+                        const logoUrl = getImageUrl(data.data.site_logo_url);
+                        addResult(`🖼️ رابط الشعار: ${logoUrl}`, 'info');
+                    }
+                } else {
+                    addResult(`❌ فشل تحميل الإعدادات العامة (${response.status} ${response.statusText})`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ خطأ في تحميل الإعدادات العامة: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDesignSettings() {
+            addResult('🎨 اختبار إعدادات التصميم...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/settings/design`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`✅ نجح تحميل إعدادات التصميم (${response.status})`, 'success');
+                    addResult(`<pre>${JSON.stringify(data, null, 2)}</pre>`, 'info');
+                    
+                    if (data.data && data.data.site_footer_logo_url) {
+                        const logoUrl = getImageUrl(data.data.site_footer_logo_url);
+                        addResult(`🖼️ رابط شعار الفوتر: ${logoUrl}`, 'info');
+                    }
+                } else {
+                    addResult(`❌ فشل تحميل إعدادات التصميم (${response.status} ${response.statusText})`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ خطأ في تحميل إعدادات التصميم: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBoth() {
+            clearResults();
+            addResult('🚀 اختبار كامل لشعار الفوتر...', 'info');
+            
+            try {
+                // اختبار الإعدادات العامة
+                const generalResponse = await fetch(`${API_BASE}/settings/general`);
+                const generalData = generalResponse.ok ? await generalResponse.json() : null;
+                
+                // اختبار إعدادات التصميم
+                const designResponse = await fetch(`${API_BASE}/settings/design`);
+                const designData = designResponse.ok ? await designResponse.json() : null;
+                
+                const settings = generalData?.data;
+                const designSettings = designData?.data;
+                
+                addResult(`📊 النتائج:`, 'info');
+                addResult(`- الإعدادات العامة: ${settings ? '✅ محملة' : '❌ غير محملة'}`, settings ? 'success' : 'error');
+                addResult(`- إعدادات التصميم: ${designSettings ? '✅ محملة' : '❌ غير محملة'}`, designSettings ? 'success' : 'error');
+                
+                // تحديد شعار الفوتر
+                let footerLogo;
+                let logoSource;
+                
+                if (designSettings?.site_footer_logo_url) {
+                    footerLogo = getImageUrl(designSettings.site_footer_logo_url);
+                    logoSource = 'إعدادات التصميم';
+                } else if (settings?.site_logo_url) {
+                    footerLogo = getImageUrl(settings.site_logo_url);
+                    logoSource = 'الإعدادات العامة';
+                } else {
+                    footerLogo = '/images/logo.png';
+                    logoSource = 'افتراضي';
+                }
+                
+                addResult(`🎯 مصدر الشعار: ${logoSource}`, 'info');
+                addResult(`🔗 رابط الشعار: ${footerLogo}`, 'info');
+                
+                // عرض الشعار
+                const logoContainer = document.getElementById('logo-container');
+                logoContainer.innerHTML = `
+                    <img 
+                        src="${footerLogo}" 
+                        alt="شعار الموقع" 
+                        onerror="this.src='/images/logo.png'; console.log('فشل تحميل الشعار')"
+                        onload="console.log('تم تحميل الشعار بنجاح')"
+                    />
+                    <p>مصدر الشعار: ${logoSource}</p>
+                `;
+                
+            } catch (error) {
+                addResult(`❌ خطأ في الاختبار: ${error.message}`, 'error');
+            }
+        }
+
+        // تشغيل الاختبار تلقائياً عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            addResult('تم تحميل الصفحة. اضغط على "اختبار كليهما" لبدء الاختبار.', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Toast Success Styles */
+.toast-success {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #10b981 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  padding: 20px 24px !important;
+  margin: 12px !important;
+  max-width: 450px !important;
+  min-width: 320px !important;
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  backdrop-filter: blur(10px) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Force all text in success toast to be white */
+.toast-success * {
+  color: #ffffff !important;
+}
+
+.toast-success p,
+.toast-success span,
+.toast-success div,
+.toast-success h1,
+.toast-success h2,
+.toast-success h3,
+.toast-success h4,
+.toast-success h5,
+.toast-success h6 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.toast-success::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7) !important;
+  animation: shimmer 2s infinite !important;
+}
+
+.toast-success .toast-description {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  margin-top: 6px !important;
+  line-height: 1.4 !important;
+  font-family: 'Cairo', sans-serif !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Toast Error Styles */
+.toast-error {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #ef4444 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px rgba(239, 68, 68, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  padding: 20px 24px !important;
+  margin: 12px !important;
+  max-width: 450px !important;
+  min-width: 320px !important;
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  backdrop-filter: blur(10px) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Force all text in error toast to be white */
+.toast-error * {
+  color: #ffffff !important;
+}
+
+.toast-error p,
+.toast-error span,
+.toast-error div,
+.toast-error h1,
+.toast-error h2,
+.toast-error h3,
+.toast-error h4,
+.toast-error h5,
+.toast-error h6 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.toast-error::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, #ef4444, #f87171, #fca5a5) !important;
+  animation: shimmer 2s infinite !important;
+}
+
+.toast-error .toast-description {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  margin-top: 6px !important;
+  line-height: 1.4 !important;
+  font-family: 'Cairo', sans-serif !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Toast Container */
+[data-sonner-toaster] {
+  position: fixed !important;
+  top: 24px !important;
+  right: 24px !important;
+  z-index: 9999 !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+
+/* Toast Progress Bar */
+.toast-success [data-sonner-progress] {
+  background: rgba(255, 255, 255, 0.4) !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+}
+
+.toast-error [data-sonner-progress] {
+  background: rgba(255, 255, 255, 0.4) !important;
+  height: 3px !important;
+  border-radius: 2px !important;
+}
+
+/* Toast Close Button */
+.toast-success [data-sonner-close-button],
+.toast-error [data-sonner-close-button] {
+  color: white !important;
+  opacity: 0.8 !important;
+  transition: all 0.2s ease !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.toast-success [data-sonner-close-button]:hover,
+.toast-error [data-sonner-close-button]:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Toast Icon */
+.toast-success [data-sonner-icon],
+.toast-error [data-sonner-icon] {
+  font-size: 20px !important;
+  margin-left: 8px !important;
+}
+
+/* Toast Title */
+.toast-success [data-sonner-title],
+.toast-error [data-sonner-title] {
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Force all Sonner elements to be white */
+.toast-success [data-sonner-toast],
+.toast-error [data-sonner-toast] {
+  color: #ffffff !important;
+}
+
+.toast-success [data-sonner-toast] *,
+.toast-error [data-sonner-toast] * {
+  color: #ffffff !important;
+}
+
+/* Toast Description */
+.toast-success [data-sonner-description],
+.toast-error [data-sonner-description] {
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+  margin-top: 4px !important;
+  color: #ffffff !important;
+  opacity: 0.95 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Toast Action Button */
+.toast-success [data-sonner-action],
+.toast-error [data-sonner-action] {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-family: 'Cairo', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  transition: all 0.2s ease !important;
+}
+
+.toast-success [data-sonner-action]:hover,
+.toast-error [data-sonner-action]:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* RTL Support */
+[dir="rtl"] .toast-success,
+[dir="rtl"] .toast-error {
+  text-align: right !important;
+}
+
+[dir="rtl"] .toast-success [data-sonner-icon],
+[dir="rtl"] .toast-error [data-sonner-icon] {
+  margin-left: 0 !important;
+  margin-right: 8px !important;
+}
+
+/* ULTIMATE WHITE TEXT FORCE - Override everything */
+.toast-success,
+.toast-success *,
+.toast-success p,
+.toast-success span,
+.toast-success div,
+.toast-success h1,
+.toast-success h2,
+.toast-success h3,
+.toast-success h4,
+.toast-success h5,
+.toast-success h6,
+.toast-success [data-sonner-title],
+.toast-success [data-sonner-description],
+.toast-success [data-sonner-toast],
+.toast-success [data-sonner-toast] * {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.toast-error,
+.toast-error *,
+.toast-error p,
+.toast-error span,
+.toast-error div,
+.toast-error h1,
+.toast-error h2,
+.toast-error h3,
+.toast-error h4,
+.toast-error h5,
+.toast-error h6,
+.toast-error [data-sonner-title],
+.toast-error [data-sonner-description],
+.toast-error [data-sonner-toast],
+.toast-error [data-sonner-toast] * {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}

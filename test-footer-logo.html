@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار شعار الفوتر</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        .success { 
+            background-color: #d4edda; 
+            border-color: #c3e6cb; 
+            color: #155724; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            border-color: #f5c6cb; 
+            color: #721c24; 
+        }
+        .info { 
+            background-color: #d1ecf1; 
+            border-color: #bee5eb; 
+            color: #0c5460; 
+        }
+        .footer-preview { 
+            background-color: #1f2937; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+        .footer-logo { 
+            height: 48px; 
+            width: auto; 
+            margin-bottom: 16px; 
+            filter: brightness(0) invert(1);
+        }
+        .loading { 
+            height: 48px; 
+            width: 128px; 
+            background-color: #374151; 
+            border-radius: 4px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px; 
+            background-color: #007bff; 
+            color: white;
+        }
+        button:hover { background-color: #0056b3; }
+        .logo-test { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin: 10px 0;
+        }
+        .logo-test img { 
+            height: 40px; 
+            width: auto; 
+            border: 1px solid #ddd; 
+            padding: 5px; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار شعار الفوتر</h1>
+        <p>هذه الصفحة تختبر عرض شعار الفوتر من API مع معالجة الأخطاء وحالة التحميل.</p>
+        
+        <div id="results"></div>
+        
+        <div class="test-section">
+            <h3>اختبار API</h3>
+            <button onclick="testApiEndpoints()">اختبار نقاط النهاية</button>
+            <button onclick="testLogoDisplay()">اختبار عرض الشعار</button>
+            <button onclick="clearResults()">مسح النتائج</button>
+        </div>
+
+        <div class="test-section">
+            <h3>معاينة الفوتر</h3>
+            <div class="footer-preview">
+                <div id="footer-logo-container">
+                    <div class="loading">
+                        <span>جاري التحميل...</span>
+                    </div>
+                </div>
+                <p>منصة التسوق الإلكتروني الرائدة في الكويت، نقدم لك أفضل المنتجات الغذائية والاستهلاكية من موردين موثوقين.</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>اختبار الشعارات المختلفة</h3>
+            <div id="logo-tests"></div>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-section ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testApiEndpoints() {
+            clearResults();
+            addResult('بدء اختبار نقاط النهاية...', 'info');
+
+            const endpoints = [
+                '/settings/general',
+                '/settings/design'
+            ];
+
+            for (const endpoint of endpoints) {
+                try {
+                    const fullUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}${endpoint}`;
+                    addResult(`اختبار: ${fullUrl}`, 'info');
+                    
+                    const response = await fetch(fullUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ ${endpoint} - نجح (${response.status})`, 'success');
+                        
+                        // تحليل البيانات للشعار
+                        if (endpoint === '/settings/general' && data.data) {
+                            const logoInfo = {
+                                site_name: data.data.site_name,
+                                site_logo: data.data.site_logo,
+                                site_logo_url: data.data.site_logo_url
+                            };
+                            addResult(`معلومات الشعار العام: ${JSON.stringify(logoInfo, null, 2)}`, 'info');
+                        }
+                        
+                        if (endpoint === '/settings/design' && data.data) {
+                            const designInfo = {
+                                site_footer_logo: data.data.site_footer_logo,
+                                site_footer_logo_url: data.data.site_footer_logo_url
+                            };
+                            addResult(`معلومات شعار الفوتر: ${JSON.stringify(designInfo, null, 2)}`, 'info');
+                        }
+                    } else {
+                        addResult(`❌ ${endpoint} - فشل (${response.status} ${response.statusText})`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${endpoint} - خطأ: ${error.message}`, 'error');
+                }
+            }
+
+            addResult('انتهى اختبار نقاط النهاية!', 'info');
+        }
+
+        async function testLogoDisplay() {
+            addResult('بدء اختبار عرض الشعار...', 'info');
+            
+            try {
+                // محاكاة دالة getImageUrl
+                function getImageUrl(imagePath) {
+                    if (!imagePath) return '/images/logo.png';
+                    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                        return imagePath;
+                    }
+                    if (imagePath.startsWith('storage/')) {
+                        return `http://localhost:8000/storage/${imagePath}`;
+                    }
+                    if (imagePath.startsWith('/')) {
+                        return `http://localhost:8000${imagePath}`;
+                    }
+                    return `http://localhost:8000/${imagePath}`;
+                }
+
+                // جلب البيانات
+                const generalResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/settings/general`);
+                const designResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}/settings/design`);
+                
+                const generalData = generalResponse.ok ? await generalResponse.json() : null;
+                const designData = designResponse.ok ? await designResponse.json() : null;
+                
+                const settings = generalData?.data;
+                const designSettings = designData?.data;
+                
+                // تحديد شعار الفوتر
+                let footerLogo;
+                if (designSettings?.site_footer_logo_url) {
+                    footerLogo = getImageUrl(designSettings.site_footer_logo_url);
+                    addResult(`استخدام شعار الفوتر المخصص: ${footerLogo}`, 'success');
+                } else if (settings?.site_logo_url) {
+                    footerLogo = getImageUrl(settings.site_logo_url);
+                    addResult(`استخدام شعار الموقع العام: ${footerLogo}`, 'info');
+                } else {
+                    footerLogo = '/images/logo.png';
+                    addResult(`استخدام الشعار الافتراضي: ${footerLogo}`, 'info');
+                }
+                
+                // عرض الشعار في المعاينة
+                const logoContainer = document.getElementById('footer-logo-container');
+                logoContainer.innerHTML = `
+                    <img 
+                        src="${footerLogo}" 
+                        alt="شعار الموقع" 
+                        class="footer-logo"
+                        onerror="this.src='/images/logo.png'"
+                        onload="console.log('تم تحميل الشعار بنجاح')"
+                    />
+                `;
+                
+                // اختبار الشعارات المختلفة
+                testDifferentLogos(settings, designSettings);
+                
+            } catch (error) {
+                addResult(`خطأ في اختبار عرض الشعار: ${error.message}`, 'error');
+            }
+        }
+
+        function testDifferentLogos(settings, designSettings) {
+            const logoTestsDiv = document.getElementById('logo-tests');
+            logoTestsDiv.innerHTML = '';
+            
+            const logos = [
+                { name: 'شعار الفوتر المخصص', url: designSettings?.site_footer_logo_url },
+                { name: 'شعار الموقع العام', url: settings?.site_logo_url },
+                { name: 'شعار افتراضي', url: '/images/logo.png' }
+            ];
+            
+            logos.forEach(logo => {
+                if (logo.url) {
+                    const logoDiv = document.createElement('div');
+                    logoDiv.className = 'logo-test';
+                    logoDiv.innerHTML = `
+                        <span>${logo.name}:</span>
+                        <img src="${logo.url}" alt="${logo.name}" onerror="this.src='/images/logo.png'" />
+                        <span>${logo.url}</span>
+                    `;
+                    logoTestsDiv.appendChild(logoDiv);
+                }
+            });
+        }
+
+        // تشغيل الاختبارات تلقائياً عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            addResult('تم تحميل الصفحة. اضغط على "اختبار نقاط النهاية" لبدء الاختبار.', 'info');
+        });
+    </script>
+</body>
+</html>

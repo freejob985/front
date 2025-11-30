@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار فلاتر البحث - Engeb</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .test-section h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-link {
+            display: block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .test-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .test-description {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-right: 4px solid #667eea;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 اختبار فلاتر البحث</h1>
+            <p class="subtitle">صفحة اختبار شاملة لجميع فلاتر البحث في منصة Engeb</p>
+        </div>
+
+        <!-- Basic Search Test -->
+        <div class="test-section">
+            <h2><span class="icon">🔎</span> اختبار البحث الأساسي</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من عمل البحث بالكلمات المفتاحية
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=تفاح" class="test-link" target="_blank">
+                    بحث عن "تفاح" ✓
+                </a>
+                <a href="http://localhost:5174/search?q=خضروات" class="test-link" target="_blank">
+                    بحث عن "خضروات" ✓
+                </a>
+                <a href="http://localhost:5174/search?q=" class="test-link" target="_blank">
+                    بحث فارغ (كل المنتجات) ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Category Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">📁</span> اختبار فلتر الأقسام</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات حسب القسم
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&category=1" class="test-link" target="_blank">
+                    قسم رقم 1 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&category=2" class="test-link" target="_blank">
+                    قسم رقم 2 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=تفاح&category=1" class="test-link" target="_blank">
+                    بحث + قسم ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Subcategory Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">📂</span> اختبار فلتر الأقسام الفرعية</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات حسب القسم الفرعي
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&category=1&subcategory=2" class="test-link" target="_blank">
+                    قسم 1 + قسم فرعي 2 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&subcategory=1" class="test-link" target="_blank">
+                    قسم فرعي 1 فقط ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Brand Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">🏷️</span> اختبار فلتر الماركات</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات حسب الماركة
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&brand=1" class="test-link" target="_blank">
+                    ماركة رقم 1 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&brand=2" class="test-link" target="_blank">
+                    ماركة رقم 2 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=تفاح&brand=1" class="test-link" target="_blank">
+                    بحث + ماركة ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Rating Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">⭐</span> اختبار فلتر التقييم</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات حسب التقييم
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&rating=5" class="test-link" target="_blank">
+                    تقييم 5 نجوم فأكثر ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&rating=4" class="test-link" target="_blank">
+                    تقييم 4 نجوم فأكثر ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&rating=3" class="test-link" target="_blank">
+                    تقييم 3 نجوم فأكثر ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Price Range Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">💰</span> اختبار فلتر نطاق السعر</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات حسب نطاق السعر
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&min_price=0&max_price=10" class="test-link" target="_blank">
+                    من 0 إلى 10 د.ك ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&min_price=10&max_price=50" class="test-link" target="_blank">
+                    من 10 إلى 50 د.ك ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&min_price=50" class="test-link" target="_blank">
+                    أكثر من 50 د.ك ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Availability Filter Test -->
+        <div class="test-section">
+            <h2><span class="icon">📦</span> اختبار فلتر التوفر</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من فلترة المنتجات المتوفرة فقط
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&available=true" class="test-link" target="_blank">
+                    المنتجات المتوفرة فقط ✓
+                </a>
+                <a href="http://localhost:5174/search?q=تفاح&available=true" class="test-link" target="_blank">
+                    بحث + متوفر ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Combined Filters Test -->
+        <div class="test-section">
+            <h2><span class="icon">🎯</span> اختبار الفلاتر المدمجة</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من عمل عدة فلاتر معاً
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=1&category=1&subcategory=2&rating=5" class="test-link" target="_blank">
+                    <strong>الاختبار الشامل:</strong> بحث + قسم + قسم فرعي + تقييم ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&category=1&brand=1&min_price=10&max_price=50" class="test-link" target="_blank">
+                    قسم + ماركة + نطاق سعر ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&rating=4&available=true&min_price=5&max_price=100" class="test-link" target="_blank">
+                    تقييم + متوفر + نطاق سعر ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Sorting Test -->
+        <div class="test-section">
+            <h2><span class="icon">🔄</span> اختبار الترتيب</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من عمل ترتيب النتائج
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&sort=price-low" class="test-link" target="_blank">
+                    ترتيب: السعر من الأقل للأعلى ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&sort=price-high" class="test-link" target="_blank">
+                    ترتيب: السعر من الأعلى للأقل ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&sort=rating" class="test-link" target="_blank">
+                    ترتيب: الأعلى تقييماً ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&sort=newest" class="test-link" target="_blank">
+                    ترتيب: الأحدث ✓
+                </a>
+            </div>
+        </div>
+
+        <!-- Pagination Test -->
+        <div class="test-section">
+            <h2><span class="icon">📄</span> اختبار الصفحات</h2>
+            <div class="test-description">
+                <strong>الهدف:</strong> التأكد من عمل التنقل بين الصفحات
+            </div>
+            <div class="grid">
+                <a href="http://localhost:5174/search?q=&page=1" class="test-link" target="_blank">
+                    الصفحة 1 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&page=2" class="test-link" target="_blank">
+                    الصفحة 2 ✓
+                </a>
+                <a href="http://localhost:5174/search?q=&category=1&page=2" class="test-link" target="_blank">
+                    قسم + صفحة 2 ✓
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📝 ملاحظة: تأكد من تشغيل الخادم على <code>http://localhost:5174</code></p>
+            <p>🔧 إذا واجهت أي مشاكل، تحقق من console في المتصفح</p>
+            <p style="margin-top: 15px;">✅ جميع الاختبارات جاهزة للتنفيذ</p>
+        </div>
+    </div>
+</body>
+</html>
+
+

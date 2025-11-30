@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار متغيرات البيئة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 اختبار متغيرات البيئة</h1>
+        <p>هذا الملف يختبر قراءة متغيرات البيئة في Vite</p>
+        
+        <button onclick="testEnvVars()">اختبار متغيرات البيئة</button>
+        <button onclick="testApiCall()">اختبار استدعاء API</button>
+        <button onclick="clearResults()">مسح النتائج</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script type="module">
+        function testEnvVars() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>نتائج اختبار متغيرات البيئة:</h2>';
+            
+            // اختبار متغيرات البيئة
+            const envVars = {
+                'VITE_API_URL': import.meta.env.VITE_API_URL,
+                'VITE_API_BASE_URL': import.meta.env.VITE_API_BASE_URL,
+                'VITE_API_PREFIX': import.meta.env.VITE_API_PREFIX,
+                'VITE_ADMIN_URL': import.meta.env.VITE_ADMIN_URL,
+                'VITE_APP_URL': import.meta.env.VITE_APP_URL,
+                'VITE_APP_NAME': import.meta.env.VITE_APP_NAME,
+                'VITE_DEBUG': import.meta.env.VITE_DEBUG,
+                'VITE_APP_ENV': import.meta.env.VITE_APP_ENV
+            };
+            
+            Object.entries(envVars).forEach(([key, value]) => {
+                const status = value ? 'success' : 'error';
+                const statusText = value ? '✅ موجود' : '❌ غير موجود';
+                resultsDiv.innerHTML += `
+                    <div class="result ${status}">
+                        <strong>${key}:</strong> <code>${value || 'غير محدد'}</code> ${statusText}
+                    </div>
+                `;
+            });
+            
+            // اختبار API URL
+            const apiUrl = import.meta.env.VITE_API_URL || 'غير محدد';
+            const apiStatus = apiUrl !== 'غير محدد' ? 'success' : 'error';
+            resultsDiv.innerHTML += `
+                <div class="result ${apiStatus}">
+                    <h3>الرابط المستخدم للـ API:</h3>
+                    <p><strong>${apiUrl}</strong></p>
+                    <p>${apiUrl !== 'غير محدد' ? '✅ تم قراءة متغير البيئة بنجاح' : '❌ فشل في قراءة متغير البيئة'}</p>
+                </div>
+            `;
+            
+            // اختبار القيم الافتراضية
+            const defaultApiUrl = 'http://localhost:8000/api/v1';
+            const currentApiUrl = import.meta.env.VITE_API_URL || defaultApiUrl;
+            const isUsingEnv = import.meta.env.VITE_API_URL !== undefined;
+            
+            resultsDiv.innerHTML += `
+                <div class="result ${isUsingEnv ? 'success' : 'warning'}">
+                    <h3>مصدر رابط API:</h3>
+                    <p><strong>المصدر:</strong> ${isUsingEnv ? 'متغير البيئة (.env)' : 'القيمة الافتراضية'}</p>
+                    <p><strong>الرابط الحالي:</strong> <code>${currentApiUrl}</code></p>
+                    <p><strong>متغير البيئة:</strong> <code>${import.meta.env.VITE_API_URL || 'غير محدد'}</code></p>
+                </div>
+            `;
+        }
+        
+        async function testApiCall() {
+            const resultsDiv = document.getElementById('results');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+            
+            resultsDiv.innerHTML += '<h2>اختبار استدعاء API:</h2>';
+            resultsDiv.innerHTML += `<div class="result info">جاري اختبار الاتصال بـ: <code>${apiUrl}</code></div>`;
+            
+            try {
+                const response = await fetch(`${apiUrl}/settings/general`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultsDiv.innerHTML += `
+                        <div class="result success">
+                            <h3>✅ نجح الاتصال بالـ API</h3>
+                            <p><strong>الحالة:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>الرابط:</strong> <code>${apiUrl}</code></p>
+                            <p><strong>الاستجابة:</strong> <code>${JSON.stringify(data).substring(0, 100)}...</code></p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML += `
+                        <div class="result error">
+                            <h3>❌ فشل الاتصال بالـ API</h3>
+                            <p><strong>الحالة:</strong> ${response.status} ${response.statusText}</p>
+                            <p><strong>الرابط:</strong> <code>${apiUrl}</code></p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `
+                    <div class="result error">
+                        <h3>❌ خطأ في الاتصال</h3>
+                        <p><strong>الخطأ:</strong> ${error.message}</p>
+                        <p><strong>الرابط:</strong> <code>${apiUrl}</code></p>
+                    </div>
+                `;
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // اختبار تلقائي عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            testEnvVars();
+        });
+        
+        // جعل الدوال متاحة عالمياً
+        window.testEnvVars = testEnvVars;
+        window.testApiCall = testApiCall;
+        window.clearResults = clearResults;
+    </script>
+</body>
+</html>

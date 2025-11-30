@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار متغيرات البيئة - بسيط</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        code { background-color: #f8f9fa; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 اختبار متغيرات البيئة</h1>
+    <button onclick="testEnv()">اختبار متغيرات البيئة</button>
+    <div id="result"></div>
+
+    <script type="module">
+        function testEnv() {
+            const resultDiv = document.getElementById('result');
+            
+            const envVars = {
+                'VITE_API_URL': import.meta.env.VITE_API_URL,
+                'VITE_API_BASE_URL': import.meta.env.VITE_API_BASE_URL,
+                'VITE_APP_NAME': import.meta.env.VITE_APP_NAME
+            };
+            
+            let html = '<h2>نتائج الاختبار:</h2>';
+            
+            Object.entries(envVars).forEach(([key, value]) => {
+                const status = value ? 'success' : 'error';
+                const statusText = value ? '✅ موجود' : '❌ غير موجود';
+                html += `<div class="result ${status}"><strong>${key}:</strong> <code>${value || 'غير محدد'}</code> ${statusText}</div>`;
+            });
+            
+            // اختبار خاص لـ VITE_API_URL
+            const apiUrl = import.meta.env.VITE_API_URL;
+            if (apiUrl && apiUrl.includes('adminxd.eliteonegrocery.com')) {
+                html += `<div class="result success"><h3>✅ نجح!</h3><p>متغير VITE_API_URL يتم قراءته بشكل صحيح: <code>${apiUrl}</code></p></div>`;
+            } else {
+                html += `<div class="result error"><h3>❌ فشل!</h3><p>متغير VITE_API_URL لا يتم قراءته بشكل صحيح. القيمة: <code>${apiUrl || 'غير محدد'}</code></p></div>`;
+            }
+            
+            resultDiv.innerHTML = html;
+        }
+        
+        // اختبار تلقائي عند تحميل الصفحة
+        window.addEventListener('load', testEnv);
+        window.testEnv = testEnv;
+    </script>
+</body>
+</html>

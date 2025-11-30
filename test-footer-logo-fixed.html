@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار شعار الفوتر - الإصلاح</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result { 
+            margin: 10px 0; 
+            padding: 15px; 
+            border-radius: 5px; 
+            border: 1px solid #ddd;
+        }
+        .success { 
+            background-color: #d4edda; 
+            border-color: #c3e6cb; 
+            color: #155724; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            border-color: #f5c6cb; 
+            color: #721c24; 
+        }
+        .info { 
+            background-color: #d1ecf1; 
+            border-color: #bee5eb; 
+            color: #0c5460; 
+        }
+        .footer-preview { 
+            background-color: #1f2937; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+        }
+        .footer-logo { 
+            height: 48px; 
+            width: auto; 
+            margin-bottom: 16px; 
+            filter: brightness(0) invert(1);
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 4px; 
+            background-color: #007bff; 
+            color: white;
+        }
+        button:hover { background-color: #0056b3; }
+        pre { 
+            background-color: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+        }
+        .logo-test { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin: 10px 0;
+        }
+        .logo-test img { 
+            height: 40px; 
+            width: auto; 
+            border: 1px solid #ddd; 
+            padding: 5px; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار شعار الفوتر - بعد الإصلاح</h1>
+        <p>هذه الصفحة تختبر شعار الفوتر بعد إصلاح دالة getImageUrl.</p>
+        
+        <div>
+            <button onclick="testFooterLogo()">اختبار شعار الفوتر</button>
+            <button onclick="testImageUrl()">اختبار دالة getImageUrl</button>
+            <button onclick="clearResults()">مسح النتائج</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div class="footer-preview">
+            <h3>معاينة الفوتر:</h3>
+            <div id="footer-logo-container">
+                <p>اضغط على "اختبار شعار الفوتر" لرؤية الشعار</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        // محاكاة دالة getImageUrl المحدثة
+        function getImageUrl(imagePath) {
+            if (!imagePath) return '/placeholder.svg';
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            const baseUrl = 'http://localhost:8000';
+            
+            // If it's a storage path, prepend the base URL
+            if (imagePath.startsWith('storage/') || imagePath.startsWith('about-pages/') || imagePath.startsWith('logos/') || imagePath.startsWith('categories/') || imagePath.startsWith('products/') || imagePath.startsWith('reviews/') || imagePath.startsWith('settings/')) {
+                return `${baseUrl}/storage/${imagePath}`;
+            }
+            
+            // If it starts with a slash, it's already a relative path
+            if (imagePath.startsWith('/')) {
+                return `${baseUrl}${imagePath}`;
+            }
+            
+            // For other paths, assume they're relative to the base URL
+            return `${baseUrl}/${imagePath}`;
+        }
+
+        async function testFooterLogo() {
+            clearResults();
+            addResult('🔍 اختبار شعار الفوتر...', 'info');
+            
+            try {
+                // جلب إعدادات التصميم
+                const designResponse = await fetch(`${API_BASE}/settings/design`);
+                const designData = designResponse.ok ? await designResponse.json() : null;
+                
+                if (!designData || !designData.success) {
+                    addResult('❌ فشل في جلب إعدادات التصميم', 'error');
+                    return;
+                }
+                
+                const designSettings = designData.data;
+                addResult('✅ تم جلب إعدادات التصميم بنجاح', 'success');
+                
+                // عرض البيانات
+                addResult(`<pre>${JSON.stringify(designSettings, null, 2)}</pre>`, 'info');
+                
+                // تحديد شعار الفوتر
+                let footerLogo;
+                let logoSource;
+                
+                if (designSettings.site_footer_logo_url) {
+                    footerLogo = designSettings.site_footer_logo_url;
+                    logoSource = 'API URL';
+                    addResult(`✅ استخدام URL من API: ${footerLogo}`, 'success');
+                } else if (designSettings.site_footer_logo) {
+                    footerLogo = getImageUrl(designSettings.site_footer_logo);
+                    logoSource = 'getImageUrl function';
+                    addResult(`✅ استخدام getImageUrl: ${footerLogo}`, 'success');
+                } else {
+                    footerLogo = '/images/logo.png';
+                    logoSource = 'افتراضي';
+                    addResult(`⚠️ استخدام الشعار الافتراضي: ${footerLogo}`, 'info');
+                }
+                
+                // عرض الشعار
+                const logoContainer = document.getElementById('footer-logo-container');
+                logoContainer.innerHTML = `
+                    <img 
+                        src="${footerLogo}" 
+                        alt="شعار الموقع" 
+                        class="footer-logo"
+                        onerror="this.src='/images/logo.png'; console.log('فشل تحميل الشعار')"
+                        onload="console.log('تم تحميل الشعار بنجاح')"
+                    />
+                    <p>مصدر الشعار: ${logoSource}</p>
+                    <p>رابط الشعار: ${footerLogo}</p>
+                `;
+                
+                // اختبار تحميل الصورة
+                const img = new Image();
+                img.onload = () => {
+                    addResult('✅ تم تحميل الشعار بنجاح!', 'success');
+                };
+                img.onerror = () => {
+                    addResult('❌ فشل في تحميل الشعار', 'error');
+                };
+                img.src = footerLogo;
+                
+            } catch (error) {
+                addResult(`❌ خطأ في اختبار شعار الفوتر: ${error.message}`, 'error');
+            }
+        }
+
+        function testImageUrl() {
+            addResult('🔧 اختبار دالة getImageUrl...', 'info');
+            
+            const testPaths = [
+                'logos/site-footer-logo.png',
+                'storage/logos/site-footer-logo.png',
+                'categories/test.jpg',
+                'products/test.jpg',
+                'settings/test.jpg',
+                '/images/logo.png',
+                'http://example.com/image.jpg',
+                'https://example.com/image.jpg'
+            ];
+            
+            testPaths.forEach(path => {
+                const result = getImageUrl(path);
+                addResult(`<strong>${path}</strong> → <code>${result}</code>`, 'info');
+            });
+        }
+
+        // تشغيل الاختبار تلقائياً عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            addResult('تم تحميل الصفحة. اضغط على "اختبار شعار الفوتر" لبدء الاختبار.', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API URL Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>API URL Test</h1>
+    <p>This page tests the API URL configuration to ensure there are no duplication issues.</p>
+    
+    <div id="results"></div>
+    
+    <button onclick="testApiUrls()">Test API URLs</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testApiUrls() {
+            clearResults();
+            addResult('Starting API URL tests...', 'info');
+
+            // Test 1: Check environment variables
+            addResult('Test 1: Environment Variables', 'info');
+            addResult(`VITE_API_URL: ${import.meta.env.VITE_API_URL || 'Not set'}`, 'info');
+            addResult(`VITE_API_BASE_URL: ${import.meta.env.VITE_API_BASE_URL || 'Not set'}`, 'info');
+            addResult(`VITE_API_PREFIX: ${import.meta.env.VITE_API_PREFIX || 'Not set'}`, 'info');
+
+            // Test 2: Test settings endpoints
+            addResult('Test 2: Settings Endpoints', 'info');
+            
+            const settingsEndpoints = [
+                '/settings/general',
+                '/settings/design',
+                '/settings/payment',
+                '/settings/email',
+                '/settings/seo',
+                '/settings/developer',
+                '/settings'
+            ];
+
+            for (const endpoint of settingsEndpoints) {
+                try {
+                    const fullUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}${endpoint}`;
+                    addResult(`Testing: ${fullUrl}`, 'info');
+                    
+                    const response = await fetch(fullUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        addResult(`✅ ${endpoint} - Status: ${response.status}`, 'success');
+                    } else {
+                        addResult(`❌ ${endpoint} - Status: ${response.status} ${response.statusText}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${endpoint} - Error: ${error.message}`, 'error');
+                }
+            }
+
+            // Test 3: Test contact endpoints
+            addResult('Test 3: Contact Endpoints', 'info');
+            
+            const contactEndpoints = [
+                '/contact-methods',
+                '/contact'
+            ];
+
+            for (const endpoint of contactEndpoints) {
+                try {
+                    const fullUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'}${endpoint}`;
+                    addResult(`Testing: ${fullUrl}`, 'info');
+                    
+                    const response = await fetch(fullUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        addResult(`✅ ${endpoint} - Status: ${response.status}`, 'success');
+                    } else {
+                        addResult(`❌ ${endpoint} - Status: ${response.status} ${response.statusText}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ ${endpoint} - Error: ${error.message}`, 'error');
+                }
+            }
+
+            addResult('API URL tests completed!', 'info');
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            addResult('Page loaded. Click "Test API URLs" to start testing.', 'info');
+        });
+    </script>
+</body>
+</html>
