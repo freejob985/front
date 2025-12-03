@@ -471,8 +471,21 @@ const VendorProducts = () => {
     }
   });
 
-  const vendor = vendorData?.data;
-  const products = productsData?.products?.data || [];
+  const vendor = vendorData?.data || productsData?.vendor;
+  
+  // Extract products from different possible response structures
+  let products = [];
+  if (productsData) {
+    if (productsData.products?.data && Array.isArray(productsData.products.data)) {
+      products = productsData.products.data;
+    } else if (productsData.products && Array.isArray(productsData.products)) {
+      products = productsData.products;
+    } else if (productsData.data && Array.isArray(productsData.data)) {
+      products = productsData.data;
+    } else if (Array.isArray(productsData)) {
+      products = productsData;
+    }
+  }
 
   const handleSearch = () => {
     logger.info('بدء البحث في منتجات المورد', { vendorId: id, searchQuery, sortBy, category });
