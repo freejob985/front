@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,11 @@ import {
   Plus,
   Minus,
   ArrowLeft,
-  Eye
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react";
 
 // مكون معلومات المورد
@@ -368,14 +372,168 @@ const ProductCard = ({
   );
 };
 
+// مكون Pagination جذاب
+const PaginationComponent = ({
+  currentPage,
+  totalPages,
+  totalItems,
+  perPage,
+  onPageChange,
+  className = ""
+}: {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  perPage: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}) => {
+  if (totalPages <= 1) return null;
+
+  const startItem = (currentPage - 1) * perPage + 1;
+  const endItem = Math.min(currentPage * perPage, totalItems);
+
+  // حساب الصفحات المرئية
+  const maxVisiblePages = 7;
+  let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return (
+    <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 ${className}`}>
+      {/* معلومات الصفحة */}
+      <div className="text-sm text-gray-600">
+        عرض <span className="font-semibold text-gray-900">{startItem}</span> إلى{' '}
+        <span className="font-semibold text-gray-900">{endItem}</span> من{' '}
+        <span className="font-semibold text-gray-900">{totalItems}</span> منتج
+      </div>
+
+      {/* أزرار التنقل */}
+      <div className="flex items-center gap-2">
+        {/* زر الصفحة الأولى */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(1)}
+          disabled={currentPage === 1}
+          className="hidden sm:flex"
+          title="الصفحة الأولى"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </Button>
+
+        {/* زر السابق */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="flex items-center gap-1"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="hidden sm:inline">السابق</span>
+        </Button>
+
+        {/* أرقام الصفحات */}
+        <div className="flex items-center gap-1">
+          {startPage > 1 && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(1)}
+                className="w-10 h-10 p-0 font-medium"
+              >
+                1
+              </Button>
+              {startPage > 2 && (
+                <span className="text-gray-400 px-2">...</span>
+              )}
+            </>
+          )}
+
+          {pages.map((page) => (
+            <Button
+              key={page}
+              variant={currentPage === page ? "default" : "outline"}
+              size="sm"
+              onClick={() => onPageChange(page)}
+              className={`w-10 h-10 p-0 font-medium transition-all ${
+                currentPage === page
+                  ? "bg-primary text-white shadow-md scale-105"
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              {page}
+            </Button>
+          ))}
+
+          {endPage < totalPages && (
+            <>
+              {endPage < totalPages - 1 && (
+                <span className="text-gray-400 px-2">...</span>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onPageChange(totalPages)}
+                className="w-10 h-10 p-0 font-medium"
+              >
+                {totalPages}
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* زر التالي */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="flex items-center gap-1"
+        >
+          <span className="hidden sm:inline">التالي</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+
+        {/* زر الصفحة الأخيرة */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          className="hidden sm:flex"
+          title="الصفحة الأخيرة"
+        >
+          <ChevronsRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // المكون الرئيسي
 const VendorProducts = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const qc = useQueryClient();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [category, setCategory] = useState('all');
+  
+  // قراءة المعاملات من URL أو استخدام القيم الافتراضية
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'created_at');
+  const [category, setCategory] = useState(searchParams.get('category') || 'all');
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [wishlistedProducts, setWishlistedProducts] = useState<Set<number>>(new Set());
@@ -425,11 +583,53 @@ const VendorProducts = () => {
     }
   });
 
-  // جلب منتجات المورد
+  // دالة تحديث URL parameters
+  const updateSearchParams = (updates: { search?: string; sort?: string; category?: string; page?: number }) => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    if (updates.search !== undefined) {
+      if (updates.search) {
+        newParams.set('search', updates.search);
+      } else {
+        newParams.delete('search');
+      }
+    }
+    
+    if (updates.sort !== undefined) {
+      newParams.set('sort', updates.sort);
+    }
+    
+    if (updates.category !== undefined) {
+      if (updates.category === 'all') {
+        newParams.delete('category');
+      } else {
+        newParams.set('category', updates.category);
+      }
+    }
+    
+    if (updates.page !== undefined) {
+      if (updates.page === 1) {
+        newParams.delete('page');
+      } else {
+        newParams.set('page', updates.page.toString());
+      }
+    }
+    
+    setSearchParams(newParams);
+  };
+
+  // جلب منتجات المورد مع pagination
   const { data: productsData, isLoading: productsLoading, error, refetch } = useQuery({
-    queryKey: ["vendor-products", id, searchQuery, sortBy, category, isVendorDashboard],
+    queryKey: ["vendor-products", id, searchQuery, sortBy, category, currentPage, isVendorDashboard],
     queryFn: async () => {
-      logger.info('بدء تحميل منتجات المورد', { vendorId: id, searchQuery, sortBy, category, isVendorDashboard });
+      logger.info('بدء تحميل منتجات المورد', { 
+        vendorId: id, 
+        searchQuery, 
+        sortBy, 
+        category, 
+        page: currentPage,
+        isVendorDashboard 
+      });
       
       try {
         if (isVendorDashboard) {
@@ -437,7 +637,8 @@ const VendorProducts = () => {
           const response = await api.vendor.products.list({ 
             search: searchQuery, 
             sort_by: sortBy, 
-            category_id: category === 'all' ? undefined : category 
+            category_id: category === 'all' ? undefined : category,
+            page: currentPage
           });
           logger.info('استجابة API للمورد المسجل:', response);
           return response;
@@ -446,7 +647,8 @@ const VendorProducts = () => {
           const response = await api.vendorProducts(id!, { 
             search: searchQuery, 
             sort_by: sortBy, 
-            category_id: category === 'all' ? undefined : category 
+            category_id: category === 'all' ? undefined : category,
+            page: currentPage
           });
           logger.info('استجابة API للجمهور العام:', response);
           return response;
@@ -460,12 +662,14 @@ const VendorProducts = () => {
     retry: 2,
     staleTime: 5 * 60 * 1000, // 5 minutes
     onError: (error) => {
-      logger.error('خطأ في تحميل منتجات المورد', { vendorId: id, searchQuery, sortBy, category, error });
+      logger.error('خطأ في تحميل منتجات المورد', { vendorId: id, searchQuery, sortBy, category, page: currentPage, error });
     },
     onSuccess: (data) => {
       logger.info('تم تحميل منتجات المورد بنجاح', { 
         vendorId: id, 
         productsCount: data?.products?.data?.length || 0,
+        currentPage: data?.products?.meta?.current_page || currentPage,
+        totalPages: data?.products?.meta?.last_page || 1,
         data: data
       });
     }
@@ -475,9 +679,12 @@ const VendorProducts = () => {
   
   // Extract products from different possible response structures
   let products = [];
+  let paginationMeta = null;
+  
   if (productsData) {
     if (productsData.products?.data && Array.isArray(productsData.products.data)) {
       products = productsData.products.data;
+      paginationMeta = productsData.products.meta;
     } else if (productsData.products && Array.isArray(productsData.products)) {
       products = productsData.products;
     } else if (productsData.data && Array.isArray(productsData.data)) {
@@ -485,11 +692,38 @@ const VendorProducts = () => {
     } else if (Array.isArray(productsData)) {
       products = productsData;
     }
+    
+    // محاولة الحصول على meta من أماكن مختلفة
+    if (!paginationMeta) {
+      paginationMeta = productsData.products?.meta || productsData.meta || null;
+    }
   }
 
+  // دالة معالجة البحث
   const handleSearch = () => {
     logger.info('بدء البحث في منتجات المورد', { vendorId: id, searchQuery, sortBy, category });
-    refetch();
+    // إعادة تعيين الصفحة إلى 1 عند البحث
+    updateSearchParams({ search: searchQuery, page: 1 });
+  };
+
+  // دالة معالجة تغيير الصفحة
+  const handlePageChange = (page: number) => {
+    logger.info('تغيير الصفحة', { vendorId: id, page });
+    updateSearchParams({ page });
+    // التمرير إلى أعلى الصفحة
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // دالة معالجة تغيير الترتيب
+  const handleSortChange = (newSort: string) => {
+    setSortBy(newSort);
+    updateSearchParams({ sort: newSort, page: 1 });
+  };
+
+  // دالة معالجة تغيير الفئة
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory);
+    updateSearchParams({ category: newCategory, page: 1 });
   };
 
   // للمورد المسجل، لا نحتاج لتحميل بيانات المورد
@@ -545,9 +779,9 @@ const VendorProducts = () => {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           sortBy={sortBy}
-          setSortBy={setSortBy}
+          setSortBy={handleSortChange}
           category={category}
-          setCategory={setCategory}
+          setCategory={handleCategoryChange}
           onSearch={handleSearch}
         />
 
@@ -635,6 +869,18 @@ const VendorProducts = () => {
               />
             ))}
           </div>
+        )}
+
+        {/* Pagination */}
+        {paginationMeta && paginationMeta.last_page > 1 && (
+          <PaginationComponent
+            currentPage={paginationMeta.current_page || currentPage}
+            totalPages={paginationMeta.last_page}
+            totalItems={paginationMeta.total}
+            perPage={paginationMeta.per_page || 20}
+            onPageChange={handlePageChange}
+            className="mt-8"
+          />
         )}
       </div>
 
