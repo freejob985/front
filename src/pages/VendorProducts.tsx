@@ -675,7 +675,7 @@ const VendorProducts = () => {
     }
   });
 
-  const vendor = vendorData?.data || productsData?.vendor;
+  const vendor = vendorData?.data || (productsData as any)?.vendor;
   
   // Extract products from different possible response structures
   let products = [];
@@ -687,15 +687,15 @@ const VendorProducts = () => {
       paginationMeta = productsData.products.meta;
     } else if (productsData.products && Array.isArray(productsData.products)) {
       products = productsData.products;
-    } else if (productsData.data && Array.isArray(productsData.data)) {
-      products = productsData.data;
+    } else if ((productsData as any).data && Array.isArray((productsData as any).data)) {
+      products = (productsData as any).data;
     } else if (Array.isArray(productsData)) {
       products = productsData;
     }
     
     // محاولة الحصول على meta من أماكن مختلفة
     if (!paginationMeta) {
-      paginationMeta = productsData.products?.meta || productsData.meta || null;
+      paginationMeta = productsData.products?.meta || (productsData as any).meta || null;
     }
   }
 

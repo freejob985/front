@@ -8,7 +8,7 @@ coverage
 *.lcov
 
 # Production
-dist
+# dist - tracked for automatic deployment
 dist-ssr
 build
 
