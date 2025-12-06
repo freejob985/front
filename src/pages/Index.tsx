@@ -32,7 +32,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { getImageUrl, API_ENDPOINTS } from "@/config/api";
+import { getImageUrl } from "@/config/api";
 import { playClickSound } from "@/utils/sounds";
 
 
@@ -80,15 +80,13 @@ const HeroSlider = () => {
   useEffect(() => {
     const fetchSliders = async () => {
       try {
-        console.log('Fetching sliders from:', API_ENDPOINTS.SLIDERS?.ALL || '/api/sliders');
-        const response = await fetch(API_ENDPOINTS.SLIDERS?.ALL || '/api/sliders');
-        console.log('Response status:', response.status);
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Sliders data received:', data);
-          setSlides(data.data || []);
+        console.log('Fetching sliders using api helper...');
+        const data = await api.sliders();
+        console.log('Sliders data received:', data);
+        if (data.success && data.data && data.data.length > 0) {
+          setSlides(data.data);
         } else {
-          console.log('Response not ok, using fallback slides');
+          console.log('No sliders data, using fallback slides');
           setSlides(fallbackSlides);
         }
       } catch (error) {

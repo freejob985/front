@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { API_ENDPOINTS } from "@/config/api";
+import { api } from "@/lib/api";
 import { 
   ShoppingBag,
   Store,
@@ -290,16 +290,16 @@ export default function About() {
     const fetchAboutData = async () => {
       try {
         setLoading(true);
-        console.log('Fetching from:', API_ENDPOINTS.ABOUT?.ALL || '/api/about');
-        const response = await fetch(API_ENDPOINTS.ABOUT?.ALL || '/api/about');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch about data: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
+        console.log('Fetching about data using api helper...');
+        const data = await api.about.all();
         console.log('About data received:', data);
         console.log('Values data:', data.data?.values);
         console.log('Statistics data:', data.data?.statistics);
-        setAboutData(data.data);
+        if (data.success && data.data) {
+          setAboutData(data.data);
+        } else {
+          throw new Error('Failed to fetch about data: Invalid response');
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
         console.error('Error fetching about data:', err);

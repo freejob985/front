@@ -51,6 +51,17 @@ const getApiUrl = () => {
   
   // If VITE_API_URL is explicitly set, ALWAYS use it (highest priority)
   if (apiUrl) {
+    // Check if we should use proxy path in production (if API mode is 'proxy' and we're in production)
+    // This allows using a relative path like '/api/v1' which can be proxied by a reverse proxy
+    if (apiMode === 'proxy' && !isLocalhost && typeof window !== 'undefined') {
+      // In production with proxy mode, use relative path if API URL is absolute
+      // This assumes a reverse proxy is configured on the server
+      const urlObj = new URL(apiUrl);
+      const relativePath = urlObj.pathname;
+      console.log('✅ Security Config - Using proxy path in production:', relativePath);
+      cachedApiUrl = relativePath;
+      return cachedApiUrl;
+    }
     console.log('✅ Security Config - Using VITE_API_URL from environment:', apiUrl);
     cachedApiUrl = apiUrl;
     return cachedApiUrl;
@@ -59,6 +70,12 @@ const getApiUrl = () => {
   // If VITE_API_BASE_URL is set, construct the full URL
   if (apiBaseUrl) {
     const fullUrl = `${apiBaseUrl}${apiPrefix}`;
+    // Check if we should use proxy path
+    if (apiMode === 'proxy' && !isLocalhost && typeof window !== 'undefined') {
+      console.log('✅ Security Config - Using proxy path from VITE_API_BASE_URL:', apiPrefix);
+      cachedApiUrl = apiPrefix;
+      return cachedApiUrl;
+    }
     console.log('✅ Security Config - Constructed from VITE_API_BASE_URL:', fullUrl);
     cachedApiUrl = fullUrl;
     return cachedApiUrl;
@@ -67,6 +84,7 @@ const getApiUrl = () => {
   // Fallback to default production URL if no environment variables are set
   const fallbackUrl = 'https://adminxd.eliteonegrocery.com/api/v1';
   console.log('⚠️ Security Config - No environment variables set, using fallback:', fallbackUrl);
+  console.warn('⚠️ WARNING: Using fallback API URL. Please set VITE_API_URL in your .env file.');
   cachedApiUrl = fallbackUrl;
   return cachedApiUrl;
 };

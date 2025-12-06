@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Store, Eye, EyeOff, Loader2, CheckCircle, MapPin, Building2 } from 'lucide-react';
 import vendorAuthService from '@/services/vendorAuth';
 import locationApi from '@/services/locationApi';
+import { api } from '@/lib/api';
 import type { VendorSignupData } from '@/services/vendorAuth';
 import type { Governorate, City, BusinessCategory } from '@/services/locationApi';
 
@@ -65,30 +66,18 @@ export default function VendorSignup() {
     const loadCustomerData = async () => {
       try {
         // محاولة جلب بيانات العميل المسجل
-        const apiUrl = import.meta.env.VITE_API_URL || `${import.meta.env.VITE_API_BASE_URL || 'https://adminxd.eliteonegrocery.com'}${import.meta.env.VITE_API_PREFIX || '/api/v1'}`;
-        const response = await fetch(`${apiUrl}/auth/me`, {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.user) {
-            const user = data.user;
-            // ملء البيانات الأساسية من بيانات العميل
-            setFormData(prev => ({
-              ...prev,
-              name: user.name || '',
-              email: user.email || '',
-              phone: user.phone || '',
-              // يمكن إضافة المزيد من الحقول إذا كانت متاحة
-            }));
-            setDataPrefilled(true);
-          }
+        const data = await api.auth.me();
+        if (data.user) {
+          const user = data.user;
+          // ملء البيانات الأساسية من بيانات العميل
+          setFormData(prev => ({
+            ...prev,
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || '',
+            // يمكن إضافة المزيد من الحقول إذا كانت متاحة
+          }));
+          setDataPrefilled(true);
         }
       } catch (error) {
         // لا نعرض خطأ للمستخدم، فقط لا نملأ البيانات

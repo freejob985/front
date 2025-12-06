@@ -296,6 +296,7 @@ export const api = {
     method: 'DELETE',
   }),
 
+  sliders: () => fetchJson<{ success: boolean; data: Array<{ id: number; title: string; subtitle: string; description: string; button_text: string; button_url: string; gradient_color: string; background_image: string; badge: string }> }>(`/sliders`),
   categories: () => fetchJson<{ success: boolean; data: { name_ar: string; slug: string; image_url?: string; subcategories_count: number; products_count: number }[] }>(`/categories`),
   mainCategories: () => fetchJson<{ success: boolean; data: { id: number; name_ar: string; name_en: string; slug: string; image_url?: string; subcategories_count: number; products_count: number }[] }>(`/categories/main`),
   supermarketCategories: () => fetchJson<{ success: boolean; data: { id: number; name_ar: string; name_en: string; slug: string; image_url?: string; subcategories_count: number; products_count: number }[] }>(`/categories/supermarket`),
@@ -721,6 +722,15 @@ export const api = {
     },
     categories: () => fetchJson<{ success: boolean; data: string[] }>(`/faqs/categories`),
     get: (id: number) => fetchJson<{ success: boolean; data: { id: number; question_ar: string; answer_ar: string; category: string; sort_order: number } }>(`/faqs/${id}`),
+  },
+  about: {
+    all: () => fetchJson<{ success: boolean; data: any }>(`/about`),
+    hero: () => fetchJson<{ success: boolean; data: any }>(`/about/hero`),
+    story: () => fetchJson<{ success: boolean; data: any }>(`/about/story`),
+    values: () => fetchJson<{ success: boolean; data: any }>(`/about/values`),
+    statistics: () => fetchJson<{ success: boolean; data: any }>(`/about/statistics`),
+    team: () => fetchJson<{ success: boolean; data: any }>(`/about/team`),
+    mission: () => fetchJson<{ success: boolean; data: any }>(`/about/mission`),
   },
   settings: {
     general: () => fetchJson<{
